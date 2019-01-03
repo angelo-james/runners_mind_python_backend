@@ -14,7 +14,8 @@ class GetAllUsers(Resource):
       data.append(
         {
           '_id': str(field['_id']),
-          'username': field['name']
+          'username': field['name'],
+          'email': field['email']
         }
       )
     return jsonify(data)
@@ -23,10 +24,14 @@ class AddUser(Resource):
   def post(self):
     users = mongo.db.users
     name = request.get_json()['name']
+    email = request.get_json()['email']
+    password = request.get_json()['password']
 
     name_id = users.insert(
       {
-        'name': name
+        'name': name,
+        'email': email,
+        'password': password
       }
     )
 
