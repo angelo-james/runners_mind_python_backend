@@ -7,5 +7,7 @@ app.config.from_pyfile('config.py')
 
 db = PyMongo(app)
 
+from routes.user import *
+
 if __name__ == '__main__':
   app.run(port=3800, debug=True)
