@@ -5,6 +5,22 @@ from bson.objectid import ObjectId
 
 api = Api(app)
 
+class GetAllPosts(Resource):
+  def get(self):
+    posts = mongo.db.posts
+    data = []
+
+    for field in posts.find():
+      data.append(
+        {
+          '_id': str(field['_id']),
+          'distance': field['distance'],
+          'duration': field['duration'],
+          'pace': field['pace']
+        }
+      )
+    return jsonify(data)
+  
 class DeletePost(Resource):
   def delete(self, id):
     posts = mongo.db.posts
@@ -44,5 +60,7 @@ class AddPost(Resource):
 
     return jsonify({'data': result})
 
+api.add_resource(GetAllPosts, '/api/posts')
+api.add_resource(AddPost, '/api/posts')
 api.add_resource(AddPost, '/api/posts')
 api.add_resource(DeletePost, '/api/posts/<id>')
