@@ -20,6 +20,19 @@ class GetAllPosts(Resource):
         }
       )
     return jsonify(data)
+  
+class DeletePost(Resource):
+  def delete(self, id):
+    posts = mongo.db.posts
+
+    response = posts.delete_one({'_id': ObjectId(id)})
+
+    if response.deleted_count == 1:
+      result = {'message': 'post deleted successfully'}
+    else:
+      result = {'message': 'failed to delete post'}
+
+    return jsonify({'data': result})
 
 class AddPost(Resource):
   def post(self):
@@ -49,3 +62,5 @@ class AddPost(Resource):
 
 api.add_resource(GetAllPosts, '/api/posts')
 api.add_resource(AddPost, '/api/posts')
+api.add_resource(AddPost, '/api/posts')
+api.add_resource(DeletePost, '/api/posts/<id>')
