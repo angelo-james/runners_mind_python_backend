@@ -5,6 +5,21 @@ from bson.objectid import ObjectId
 
 api = Api(app)
 
+class GetAllComments(Resource):
+  def get(self):
+    comments = mongo.db.comments
+    data = []
+
+    for field in comments.find():
+      data.append(
+        {
+          '_id': str(field['_id']),
+          'username': field['name'],
+          'comment': field['comment']
+        }
+      )
+    return jsonify(data)
+
 class AddComment(Resource):
   def post(self):
     comments = mongo.db.comments
@@ -27,4 +42,5 @@ class AddComment(Resource):
 
     return jsonify({'data': result})
 
+api.add_resource(GetAllComments, '/api/comments')
 api.add_resource(AddComment, '/api/comments')
