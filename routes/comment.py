@@ -27,4 +27,17 @@ class AddComment(Resource):
 
     return jsonify({'data': result})
 
+class UpdateComment(Resource):
+  def put(self, id):
+    comments = mongo.db.comments
+    comment = request.get_json()['comment']
+
+    comments.find_one_and_update({'_id': ObjectId(id)}, {'$set': {'comment': comment}}, upsert=False)
+    new_comment = comments.find_one({'_id': ObjectId(id)})
+
+    result = {'username': new_comment['comment'], 'message': 'comment was updated successfully'}
+
+    return jsonify({'data': result})
+
 api.add_resource(AddComment, '/api/comments')
+api.add_resource(UpdateComment, '/api/comments/<id>')
