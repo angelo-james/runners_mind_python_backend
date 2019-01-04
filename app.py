@@ -9,6 +9,7 @@ mongo = PyMongo(app)
 
 from routes.user import *
 from routes.post import *
+from routes.comment import *
 
 if __name__ == '__main__':
   app.run(port=3800, debug=True)
