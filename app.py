@@ -8,6 +8,7 @@ app.config.from_pyfile('config.py')
 mongo = PyMongo(app)
 
 from routes.user import *
+from routes.post import *
 
 if __name__ == '__main__':
   app.run(port=3800, debug=True)
