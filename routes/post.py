@@ -62,5 +62,4 @@ class AddPost(Resource):
 
 api.add_resource(GetAllPosts, '/api/posts')
 api.add_resource(AddPost, '/api/posts')
-api.add_resource(AddPost, '/api/posts')
 api.add_resource(DeletePost, '/api/posts/<id>')
