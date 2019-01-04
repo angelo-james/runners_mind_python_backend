@@ -42,5 +42,19 @@ class AddComment(Resource):
 
     return jsonify({'data': result})
 
+class DeleteComment(Resource):
+  def delete(self, id):
+    comments = mongo.db.comments
+
+    response = comments.delete_one({'_id': ObjectId(id)})
+
+    if response.deleted_count == 1:
+      result = {'message': 'post deleted successfully'}
+    else:
+      result = {'message': 'failed to delete post'}
+
+    return jsonify({'data': result})
+
+api.add_resource(DeleteComment, '/api/comments/<id>')
 api.add_resource(GetAllComments, '/api/comments')
 api.add_resource(AddComment, '/api/comments')
