@@ -4,7 +4,7 @@
 * Install the dependencies with
 
 ```
-pip install
+pip install -r requirements.txt
 ```
 
 To run app 

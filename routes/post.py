@@ -6,7 +6,7 @@ from bson.objectid import ObjectId
 api = Api(app)
 
 class AddPost(Resource):
-  def post(self):
+  def get(self):
     posts = mongo.db.posts
     distance = request.get_json()['distance']
     duration = request.get_json()['duration']
