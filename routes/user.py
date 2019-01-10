@@ -2,6 +2,15 @@ from app import app, mongo
 from flask_restful import Resource, Api
 from flask import jsonify, request
 from bson.objectid import ObjectId
+import bcrypt, datetime
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    jwt_refresh_token_required,
+    get_jwt_identity,
+    get_raw_jwt,
+    jwt_required
+)
 
 api = Api(app)
 
@@ -15,10 +24,33 @@ class GetAllUsers(Resource):
         {
           '_id': str(field['_id']),
           'username': field['name'],
-          'email': field['email']
+          'email': field['email'],
+          'password': field['password']
         }
       )
     return jsonify(data)
+
+class Login(Resource):
+  def post(self):
+    users = mongo.db.users
+    email = request.get_json()['email']
+    password = request.get_json()['password']
+    
+    user = users.find_one({
+      'email': email
+    })
+    user['_id'] = str(user['_id'])
+    
+    if user and bcrypt.checkpw(password.encode('utf8'), user['password'].encode('utf8')):
+
+      token = create_access_token(identity=user['_id'], fresh=True, expires_delta=datetime.timedelta(days=1), )
+
+      user['token'] = token
+      user.pop('password', 0)
+      
+      return jsonify(user)
+
+
 
 class AddUser(Resource):
   def post(self):
@@ -26,12 +58,14 @@ class AddUser(Resource):
     name = request.get_json()['name']
     email = request.get_json()['email']
     password = request.get_json()['password']
+    hashPassword = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt(10))
+    print(hashPassword)
 
     name_id = users.insert(
       {
         'name': name,
         'email': email,
-        'password': password
+        'password': hashPassword.decode('utf8')
       }
     )
 
@@ -70,3 +104,4 @@ api.add_resource(GetAllUsers, '/api/users')
 api.add_resource(AddUser, '/api/users')
 api.add_resource(UpdateUser, '/api/users/<id>')
 api.add_resource(DeleteUser, '/api/users/<id>')
+api.add_resource(Login, '/api/users/login')
