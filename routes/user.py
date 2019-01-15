@@ -25,7 +25,9 @@ class GetAllUsers(Resource):
           '_id': str(field['_id']),
           'username': field['name'],
           'email': field['email'],
-          'password': field['password']
+          'password': field['password'],
+          'followers': field['followers'],
+          'following': field['following']
         }
       )
     return jsonify(data)
@@ -59,13 +61,15 @@ class AddUser(Resource):
     email = request.get_json()['email']
     password = request.get_json()['password']
     hashPassword = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt(10))
-    print(hashPassword)
 
     name_id = users.insert(
       {
         'name': name,
         'email': email,
-        'password': hashPassword.decode('utf8')
+        'password': hashPassword.decode('utf8'),
+        'followers': [],
+        'following': [],
+        'posts': []
       }
     )
 
@@ -100,8 +104,22 @@ class DeleteUser(Resource):
 
     return jsonify({'data': result})
 
-api.add_resource(GetAllUsers, '/api/users')
-api.add_resource(AddUser, '/api/users')
-api.add_resource(UpdateUser, '/api/users/<id>')
-api.add_resource(DeleteUser, '/api/users/<id>')
-api.add_resource(Login, '/api/users/login')
+class Follow(Resource):
+  def put(self, id):
+    users = mongo.db.users
+    userId = request.get_json()['userId']
+
+    user = users.find_one_and_update({'_id': ObjectId(id)}, {'$addToSet': {'followers': userId}}, upsert=False)
+    
+    user2 = users.find_one_and_update({'_id': ObjectId(userId)}, {'$addToSet': {'following': id}}, upsert=False)
+    
+    user['_id'] = str(user['_id'])
+    user2['_id'] = str(user2['_id'])
+    return jsonify({'data': [{'follower': user2}, {'following': user}]})
+
+api.add_resource(GetAllUsers, '/users')
+api.add_resource(AddUser, '/users')
+api.add_resource(UpdateUser, '/users/<id>')
+api.add_resource(DeleteUser, '/users/<id>')
+api.add_resource(Login, '/users/login')
+api.add_resource(Follow, '/users/<id>/follow')
