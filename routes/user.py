@@ -117,9 +117,23 @@ class Follow(Resource):
     user2['_id'] = str(user2['_id'])
     return jsonify({'data': [{'follower': user2}, {'following': user}]})
 
+class Unfollow(Resource):
+  def put(self, id):
+    users = mongo.db.users
+    userId = request.get_json()['userId']
+
+    user = users.find_one_and_update({'_id': ObjectId(userId)}, {'$pull': {'followers': id}}, upsert=False)
+
+    user2 = users.find_one_and_update({'_id': ObjectId(id)}, {'$pull': {'following': userId}}, upsert=False)
+
+    user['_id'] = str(user['_id'])
+    user2['_id'] = str(user2['_id'])
+    return jsonify({'data': [{'follower': user2}, {'following': user}]})
+
 api.add_resource(GetAllUsers, '/users')
 api.add_resource(AddUser, '/users')
 api.add_resource(UpdateUser, '/users/<id>')
 api.add_resource(DeleteUser, '/users/<id>')
 api.add_resource(Login, '/users/login')
 api.add_resource(Follow, '/users/<id>/follow')
+api.add_resource(Unfollow, '/users/<id>/unfollow')
