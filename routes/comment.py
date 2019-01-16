@@ -67,7 +67,7 @@ class DeleteComment(Resource):
 
     return jsonify({'data': result})
 
-api.add_resource(DeleteComment, '/api/comments/<id>')
-api.add_resource(GetAllComments, '/api/comments')
-api.add_resource(AddComment, '/api/comments')
-api.add_resource(UpdateComment, '/api/comments/<id>')
+api.add_resource(DeleteComment, '/comments/<id>')
+api.add_resource(GetAllComments, '/comments')
+api.add_resource(AddComment, '/comments')
+api.add_resource(UpdateComment, '/comments/<id>')

@@ -16,6 +16,7 @@ jwt = JWTManager(app)
 from routes.user import *
 from routes.post import *
 from routes.comment import *
+from routes.postCoords import *
 
 if __name__ == '__main__':
   app.run(port=3800, debug=True)

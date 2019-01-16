@@ -14,9 +14,12 @@ class GetAllPosts(Resource):
       data.append(
         {
           '_id': str(field['_id']),
+          'userId': field['userId'],
+          'mainTimer': field['mainTimer'],
           'distance': field['distance'],
-          'duration': field['duration'],
-          'pace': field['pace']
+          'coords': field['coords'],
+          'likes': field['likes'],
+          'comments': field['comments'],
         }
       )
     return jsonify(data)
@@ -37,29 +40,39 @@ class DeletePost(Resource):
 class AddPost(Resource):
   def post(self):
     posts = mongo.db.posts
+    userId = request.get_json()['userId']
+    mainTimer = request.get_json()['mainTimer']
     distance = request.get_json()['distance']
-    duration = request.get_json()['duration']
-    pace = request.get_json()['pace']
+    coords = request.get_json()['coords']
+    likes = request.get_json()['likes']
+    comments = request.get_json()['comments']
 
     post_id = posts.insert(
-      {
+      { 
+        'userId': userId,
+        'mainTimer': mainTimer,
         'distance': distance,
-        'duration': duration,
-        'pace': pace
+        'coords': coords,
+        'likes': likes,
+        'comments': comments
       }
     )
     
     new_post = posts.find_one({'_id': post_id})
 
     result = {
+      'postId': str(new_post['_id']),
+      'userId': new_post['userId'],
+      'mainTimer': new_post['mainTimer'],
       'distance': new_post['distance'],
-      'duration': new_post['duration'],
-      'pace': new_post['pace'],
+      'coords': new_post['coords'],
+      'likes': new_post['likes'],
+      'comments': new_post['comments'],
       'message': 'post was created successfully'
     }
 
     return jsonify({'data': result})
 
-api.add_resource(GetAllPosts, '/api/posts')
-api.add_resource(AddPost, '/api/posts')
-api.add_resource(DeletePost, '/api/posts/<id>')
+api.add_resource(GetAllPosts, '/posts')
+api.add_resource(AddPost, '/posts')
+api.add_resource(DeletePost, '/posts/<id>')
