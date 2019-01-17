@@ -10,7 +10,7 @@ class GetPostCoords(Resource):
     postCoords = mongo.db.postCoords
     data = []
 
-    for field in postCoords.find_one():
+    for field in postCoords.find():
       data.append({
         'postId': field['postId'],
         'coords': field['coords']

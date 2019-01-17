@@ -9,7 +9,8 @@ from flask_jwt_extended import (
     jwt_refresh_token_required,
     get_jwt_identity,
     get_raw_jwt,
-    jwt_required
+    jwt_required,
+    decode_token
 )
 
 api = Api(app)
@@ -52,6 +53,27 @@ class Login(Resource):
       
       return jsonify(user)
 
+class Token(Resource):
+  def post(self):
+    users = mongo.db.users
+    token = request.get_json()['token']
+    
+    userToken = decode_token(token)
+    print(userToken['identity'])
+    user = users.find_one({
+      '_id': ObjectId(userToken['identity'])
+    })
+
+    print(user)
+    if user is None:
+      return jsonify({
+        'error': 'token invalid'
+      })
+    user['_id'] = str(user['_id'])
+
+    user.pop('password', 0)
+      
+    return jsonify(user)
 
 
 class AddUser(Resource):
@@ -137,3 +159,4 @@ api.add_resource(DeleteUser, '/users/<id>')
 api.add_resource(Login, '/users/login')
 api.add_resource(Follow, '/users/<id>/follow')
 api.add_resource(Unfollow, '/users/<id>/unfollow')
+api.add_resource(Token, '/users/token')
