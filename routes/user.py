@@ -36,8 +36,6 @@ class GetAllUsers(Resource):
 class Login(Resource):
   def post(self):
     users = mongo.db.users
-    posts = mongo.db.posts
-
     email = request.get_json()['email']
     password = request.get_json()['password']
     
@@ -46,14 +44,10 @@ class Login(Resource):
     })
     user['_id'] = str(user['_id'])
     
-    posts = post.find({'userId', user['_id']})
-
-
     if user and bcrypt.checkpw(password.encode('utf8'), user['password'].encode('utf8')):
 
       token = create_access_token(identity=user['_id'], fresh=True, expires_delta=datetime.timedelta(days=1), )
 
-      user['posts'] = posts
       user['token'] = token
       user.pop('password', 0)
       
